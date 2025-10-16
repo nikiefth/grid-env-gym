@@ -149,3 +149,66 @@ class GridEnv(gym.Env):
         ai, aj = self.agent_pos
         grid[ai, aj] = 3
         return grid.copy()
+    
+    def step(self, action):
+        assert self.action_space.contains(action), f"Invalid action {action}"
+        self.step_count += 1
+
+        di, dj = 0, 0
+        if action == 0:   # up
+            di, dj = -1, 0
+        elif action == 1: # down
+            di, dj = 1, 0
+        elif action == 2: # left
+            di, dj = 0, -1
+        elif action == 3: # right
+            di, dj = 0, 1
+
+        new_i = self.agent_pos[0] + di
+        new_j = self.agent_pos[1] + dj
+
+        # Check bounds
+        if not (0 <= new_i < self.M and 0 <= new_j < self.N):
+            obs = self._get_observation()
+            reward = self.reward_collision
+            terminated = True
+            truncated = False
+            info = {"reason": "out_of_bounds"}
+            return obs, reward, terminated, truncated, info
+
+        new_pos = (new_i, new_j)
+
+        # Collision with obstacle
+        if new_pos in self.obstacles:
+            # move into obstacle considered collision (we can keep agent where it was)
+            reward = self.reward_collision
+            terminated = True
+            truncated = False
+            info = {"reason": "hit_obstacle", "pos": new_pos}
+            obs = self._get_observation()
+            return obs, reward, terminated, truncated, info
+
+        # Move agent
+        self.agent_pos = new_pos
+
+        # Reached goal?
+        if self.agent_pos == self.goal_pos:
+            reward = self.reward_goal
+            terminated = True
+            truncated = False
+            info = {"reason": "reached_goal"}
+            obs = self._get_observation()
+            return obs, reward, terminated, truncated, info
+
+        # Step penalty and check truncation by max_steps
+        reward = self.reward_step
+        terminated = False
+        truncated = False
+        if self.step_count >= self.max_steps:
+            truncated = True
+            info = {"reason": "max_steps_exceeded"}
+        else:
+            info = {}
+
+        obs = self._get_observation()
+        return obs, reward, terminated, truncated, info
