@@ -212,3 +212,21 @@ class GridEnv(gym.Env):
 
         obs = self._get_observation()
         return obs, reward, terminated, truncated, info
+    
+    def render(self, mode="human"):
+        s = self.render_ascii()
+        if mode == "human":
+            print(s)
+        else:
+            return s
+
+    def render_ascii(self):
+        mapping = {0: ".", 1: "#", 2: "G", 3: "A"}
+        grid = self._get_observation()
+        rows = []
+        for i in range(self.M):
+            row = ""
+            for j in range(self.N):
+                row += mapping[int(grid[i, j])] + " "
+            rows.append(row.rstrip())
+        return "\n".join(rows)
