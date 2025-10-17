@@ -1,7 +1,10 @@
 numpy>=1.26
 matplotlib>=3.8
-gymnasium==1.0.0
+gymnasium>=0.29.0
 stable-baselines3[extra]==2.3.2
 tqdm>=4.66
 tensorboard>=2.16
-torch>=2.2.0
+
+# CPU-only PyTorch (older version that exists for Python 3.12)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.7.0+cpu

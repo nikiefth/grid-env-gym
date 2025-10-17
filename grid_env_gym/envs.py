@@ -17,12 +17,12 @@ class GridEnv(gym.Env):
         M=5,
         N=5,
         K=3,
-        max_steps=200,
+        max_steps=100,
         seed=None,
         *,
-        reward_goal=10.0,
+        reward_goal=15.0,
         reward_collision=-10.0,
-        reward_step=-0.1,
+        reward_step=-0.01,
         init_random=True,
         start_pos=None,
     ):
@@ -167,6 +167,9 @@ class GridEnv(gym.Env):
         new_i = self.agent_pos[0] + di
         new_j = self.agent_pos[1] + dj
 
+        # Distance to goal before moving
+        old_distance = np.sum(np.abs(np.array(self.agent_pos) - np.array(self.goal_pos)))
+
         # Check bounds
         if not (0 <= new_i < self.M and 0 <= new_j < self.N):
             obs = self._get_observation()
@@ -180,7 +183,6 @@ class GridEnv(gym.Env):
 
         # Collision with obstacle
         if new_pos in self.obstacles:
-            # move into obstacle considered collision (we can keep agent where it was)
             reward = self.reward_collision
             terminated = True
             truncated = False
@@ -200,8 +202,12 @@ class GridEnv(gym.Env):
             obs = self._get_observation()
             return obs, reward, terminated, truncated, info
 
-        # Step penalty and check truncation by max_steps
+        # Step penalty + distance-based shaping
         reward = self.reward_step
+        new_distance = np.sum(np.abs(np.array(self.agent_pos) - np.array(self.goal_pos)))
+        reward += 1.0 * (old_distance - new_distance)  # positive if moving closer
+
+        # --- Check max steps ---
         terminated = False
         truncated = False
         if self.step_count >= self.max_steps:
