@@ -15,8 +15,8 @@ This repository contains a custom Gymnasium environment `GridEnv` (a configurabl
 │   └── train_ppo.py         # PPO training script ( TB, final model save)
 │   └── train_dqn.py         # DQN training script (TB, final model save)
 │   └── evaluate.py          # Evaluation script that outputs DataFrame results
-├── examples/                # For future use of showing examples of training
 ├── tests/                   # Test and debugging helpers 
+├── requirements.txt         # Library requirements file 
 ├── README.md                # Project readme (this file)
 └── Design_Analysis.pdf      # Design analysis (environment, reward, training choices)
 ```
@@ -55,14 +55,14 @@ pip install -r requirements.txt  # if you created one
 Quick smoke test (fast):
 
 ```bash
-python train_ppo.py --size small
+python train_ppo.py --size small # 20k timesteps
 ```
 
 For a larger training run:
 
 ```bash
 python train_ppo.py --size medium   # 100k timesteps
-python train_ppo.py --size large    # 200k timesteps
+python train_ppo.py --size large    # 500k timesteps
 ```
 
 Models are saved to `models/ppo_grid_*.zip` and TensorBoard logs to `tb_logs/`.
@@ -91,7 +91,7 @@ Models are saved to `models/dqn_grid_*.zip` and TensorBoard logs to `tb_logs/`.
 Use the evaluation script which produces a DataFrame with average steps, average reward, and success rate.
 
 ```bash
-python evaluate_models_df_fixed.py --ppo-path models/ppo_grid_large.zip --dqn-path models/dqn_grid_large.zip --n-episodes 100
+python evaluate.py --ppo-path models/ppo_grid_large.zip --dqn-path models/dqn_grid_large.zip --n-episodes 100
 ```
 
 The script prints a small table with results. TensorBoard can be launched with:
