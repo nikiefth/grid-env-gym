@@ -20,9 +20,9 @@ class GridEnv(gym.Env):
         max_steps=100,
         seed=None,
         *,
-        reward_goal=15.0,
-        reward_collision=-10.0,
-        reward_step=-0.01,
+        reward_goal=2.0,
+        reward_collision=-1.0,
+        reward_step=-0.05,
         init_random=True,
         start_pos=None,
     ):
@@ -130,8 +130,8 @@ class GridEnv(gym.Env):
 
         self.step_count = 0
 
-        # choose positions
-        agent, goal, obstacles = self._place_random_positions()
+        # choose positions - respect provided start position if present
+        agent, goal, obstacles = self._place_random_positions(agent_start=self._start_pos)
         self.agent_pos = agent
         self.goal_pos = goal
         self.obstacles = obstacles
@@ -141,13 +141,21 @@ class GridEnv(gym.Env):
         return obs, info
 
     def _get_observation(self):
-        grid = self._make_empty_grid()
-        for (i, j) in self.obstacles:
-            grid[i, j] = 1
-        gi, gj = self.goal_pos
-        grid[gi, gj] = 2
-        ai, aj = self.agent_pos
-        grid[ai, aj] = 3
+
+        grid = self._make_empty_grid().astype(np.float32)
+
+        if self.obstacles is not None:
+            for (i, j) in self.obstacles:
+                grid[i, j] = 1.0
+
+        if self.goal_pos is not None:
+            gi, gj = self.goal_pos
+            grid[gi, gj] = 2.0
+
+        if self.agent_pos is not None:
+            ai, aj = self.agent_pos
+            grid[ai, aj] = 3.0
+
         return grid.copy()
     
     def step(self, action):
@@ -205,7 +213,7 @@ class GridEnv(gym.Env):
         # Step penalty + distance-based shaping
         reward = self.reward_step
         new_distance = np.sum(np.abs(np.array(self.agent_pos) - np.array(self.goal_pos)))
-        reward += 1.0 * (old_distance - new_distance)  # positive if moving closer
+        reward += 0.2 * (old_distance - new_distance)  # positive if moving closer
 
         # --- Check max steps ---
         terminated = False
