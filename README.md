@@ -7,17 +7,18 @@ This repository contains a custom Gymnasium environment `GridEnv` (a configurabl
 ## Repository structure
 
 ```
-├── envs/
-│   └── grid_env.py          # GridEnv implementation
-├── utils.py                 # make_env wrapper (FlattenObservation, TimeLimit, RecordEpisodeStatistics)
-├── train_ppo.py             # PPO training script (vectorized, TB, final model save)
-├── train_dqn.py             # DQN training script (TB, final model save)
-├── evaluate_models_df_fixed.py  # Evaluation script that outputs DataFrame results
-├── debug_*                  # Debugging helpers (optional)
-├── models/                  # Saved model artifacts
-├── tb_logs/                 # TensorBoard logs
+├── grid_env_gym/
+│   └── models/              # Saved model artifacts
+│   └── tb_logs/             # TensorBoard logs
+│   └── envs.py              # GridEnv implementation
+│   └── utils.py             # make_env wrapper (FlattenObservation, TimeLimit, RecordEpisodeStatistics)
+│   └── train_ppo.py         # PPO training script ( TB, final model save)
+│   └── train_dqn.py         # DQN training script (TB, final model save)
+│   └── evaluate.py          # Evaluation script that outputs DataFrame results
+├── examples/                # For future use of showing examples of training
+├── tests/                   # Test and debugging helpers 
 ├── README.md                # Project readme (this file)
-└── design_analysis.docx     # Design analysis (environment, reward, training choices)
+└── Design_Analysis.pdf      # Design analysis (environment, reward, training choices)
 ```
 
 ---
