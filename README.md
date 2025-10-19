@@ -50,7 +50,7 @@ pip install -r requirements.txt  # if you created one
 
 # How to train
 
-## PPO (recommended for experiments)
+## PPO (On-policy)
 
 Quick smoke test (fast):
 
