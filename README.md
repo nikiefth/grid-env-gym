@@ -1,4 +1,110 @@
 # Grid Navigation Gym Environment
 
-This project is about setting up a gym environment of a M X N arena with K obstacles and a final goal destination.
-After that an agent will be trained to nagivate the arena, overcome the obstacles and reach a final goal destination. 
+This repository contains a custom Gymnasium environment `GridEnv` (a configurable MxN grid navigation task) and training/evaluation scripts for PPO and DQN (Stable-Baselines3). It includes utility wrappers, training scripts with TensorBoard logging, and evaluation tools.
+
+---
+
+## Repository structure
+
+```
+├── envs/
+│   └── grid_env.py          # GridEnv implementation
+├── utils.py                 # make_env wrapper (FlattenObservation, TimeLimit, RecordEpisodeStatistics)
+├── train_ppo.py             # PPO training script (vectorized, TB, final model save)
+├── train_dqn.py             # DQN training script (TB, final model save)
+├── evaluate_models_df_fixed.py  # Evaluation script that outputs DataFrame results
+├── debug_*                  # Debugging helpers (optional)
+├── models/                  # Saved model artifacts
+├── tb_logs/                 # TensorBoard logs
+├── README.md                # Project readme (this file)
+└── design_analysis.docx     # Design analysis (environment, reward, training choices)
+```
+
+---
+
+# Setup
+
+## 1. Requirements
+
+- Python 3.11+ recommended
+- Install dependencies (pip):
+
+```bash
+python -m pip install -U pip
+python -m pip install "stable-baselines3[extra]" gymnasium numpy pandas matplotlib
+```
+
+This will install PyTorch (as required by SB3), Gymnasium, and other utilities.
+
+## 2. Optional: create a virtual environment
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # macOS / Linux
+.\.venv\Scripts\activate  # Windows
+pip install -r requirements.txt  # if you created one
+```
+
+---
+
+# How to train
+
+## PPO (recommended for experiments)
+
+Quick smoke test (fast):
+
+```bash
+python train_ppo.py --size small
+```
+
+For a larger training run:
+
+```bash
+python train_ppo.py --size medium   # 100k timesteps
+python train_ppo.py --size large    # 200k timesteps
+```
+
+Models are saved to `models/ppo_grid_*.zip` and TensorBoard logs to `tb_logs/`.
+
+## DQN (off-policy)
+
+Quick smoke test:
+
+```bash
+python train_dqn.py --size small
+```
+
+Longer run:
+
+```bash
+python train_dqn.py --size medium
+python train_dqn.py --size large
+```
+
+Models are saved to `models/dqn_grid_*.zip` and TensorBoard logs to `tb_logs/`.
+
+---
+
+# How to evaluate
+
+Use the evaluation script which produces a DataFrame with average steps, average reward, and success rate.
+
+```bash
+python evaluate_models_df_fixed.py --ppo-path models/ppo_grid_large.zip --dqn-path models/dqn_grid_large.zip --n-episodes 100
+```
+
+The script prints a small table with results. TensorBoard can be launched with:
+
+```bash
+tensorboard --logdir tb_logs
+```
+
+---
+
+# Notes
+
+- Ensure `utils.make_env` is used both for training and evaluation to avoid wrapper mismatches.
+
+---
+
+
